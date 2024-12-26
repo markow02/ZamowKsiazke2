@@ -1,0 +1,64 @@
+﻿@model ZamowKsiazke.Models.Order
+
+<div class="text-center mt-5">
+    <i class="fa-solid fa-check-circle" style="font-size: 4em; color: green;"></i>
+    <h1 class="mt-3">Zamówienie zostało złożone. Dziękujemy!</h1>
+</div>
+
+<div class="alert alert-info mt-4">
+    <h4>Informacja o płatności</h4>
+    <p>Prosimy o dokonanie płatności w sklepie do: <strong>@Model.PaymentDeadline.ToString("dd/MM/yyyy HH:mm")</strong></p>
+    <p>Zamówienie należy opłacić w ciągu 48 godzin od złożenia. Po tym czasie zamówienie może zostać anulowane.</p>
+    <p>Status zamówienia: <span class="@(Model.IsPaid ? "text-success" : "text-warning")">@Model.OrderStatus</span></p>
+</div>
+
+<h5 class="mt-5 text-center">Numer zamówienia: @Model.Id</h5>
+
+<div class="table-responsive mt-4">
+    <table class="table table-bordered">
+        <thead class="thead-light">
+            <tr>
+                <th>Obraz</th>
+                <th>Tytuł</th>
+                <th>Cena</th>
+                <th>Ilość</th>
+                <th>Razem</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.OrderItems)
+            {
+                var itemTotal = item.Book.Price * item.Quantity;
+                <tr>
+                    <td>
+                        <a class="a-cleanup" asp-controller="Store" asp-action="Details" asp-route-id="@item.Book.Id">
+                            <img src="@item.Book.ImageUrl" class="img-thumbnail" style="height: 4em" />
+                        </a>
+                    </td>
+                    <td>
+                        <a class="a-cleanup" asp-controller="Store" asp-action="Details" asp-route-id="@item.Book.Id">@item.Book.Title</a>
+                    </td>
+                    <td>
+                        @item.Book.Price.ToString("c")
+                    </td>
+                    <td>
+                        @item.Quantity
+                    </td>
+                    <td>
+                        @itemTotal.ToString("c")
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4" class="text-end">
+                    <strong>Suma:</strong>
+                </td>
+                <td>
+                    <strong>@Model.OrderTotal.ToString("c")</strong>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

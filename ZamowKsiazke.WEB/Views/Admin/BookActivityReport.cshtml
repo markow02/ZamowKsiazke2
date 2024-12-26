@@ -1,0 +1,128 @@
+@model ZamowKsiazke.ViewModel.BookActivityReportViewModel
+
+@{
+    ViewData["Title"] = "Raport aktywności książek";
+}
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Raport aktywności książek</h1>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Podsumowanie zakupów</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Całkowita liczba zakupów:</strong> @Model.TotalPurchases</p>
+                    <p><strong>Całkowity przychód z zakupów:</strong> @Model.TotalRevenue zł</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">Podsumowanie wypożyczeń</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Całkowita liczba wypożyczeń:</strong> @Model.TotalBorrowings</p>
+                    <p><strong>Całkowity przychód z wypożyczeń:</strong> @Model.TotalBorrowingRevenue zł</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Historia zakupów</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Użytkownik</th>
+                            <th>Książka</th>
+                            <th>Autor</th>
+                            <th>Ilość</th>
+                            <th>Cena</th>
+                            <th>Data zakupu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var purchase in Model.PurchaseActivities.OrderByDescending(p => p.PurchaseDate))
+                        {
+                            <tr>
+                                <td>@purchase.UserName</td>
+                                <td>@purchase.BookTitle</td>
+                                <td>@purchase.Author</td>
+                                <td>@purchase.Quantity</td>
+                                <td>@purchase.Price zł</td>
+                                <td>@purchase.PurchaseDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Historia wypożyczeń</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Użytkownik</th>
+                            <th>Książka</th>
+                            <th>Autor</th>
+                            <th>Okres (dni)</th>
+                            <th>Cena</th>
+                            <th>Data wypożyczenia</th>
+                            <th>Data zwrotu</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var borrowing in Model.BorrowingActivities.OrderByDescending(b => b.BorrowDate))
+                        {
+                            <tr>
+                                <td>@borrowing.UserName</td>
+                                <td>@borrowing.BookTitle</td>
+                                <td>@borrowing.Author</td>
+                                <td>@borrowing.BorrowingDays</td>
+                                <td>@borrowing.BorrowingPrice zł</td>
+                                <td>@borrowing.BorrowDate.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @(borrowing.BorrowDate.AddDays(borrowing.BorrowingDays).ToLocalTime().ToString("dd/MM/yyyy"))
+                                </td>
+                                <td>
+                                    @{
+                                        var statusClass = borrowing.Status switch
+                                        {
+                                            "Pending" => "bg-warning",
+                                            "Approved" => "bg-success",
+                                            "Rejected" => "bg-danger",
+                                            "Completed" => "bg-info",
+                                            _ => "bg-secondary"
+                                        };
+                                    }
+                                    <span class="badge @statusClass">@borrowing.Status</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4">
+        <p class="text-muted">Raport wygenerowany: @Model.ReportGeneratedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</p>
+    </div>
+</div>
+
+

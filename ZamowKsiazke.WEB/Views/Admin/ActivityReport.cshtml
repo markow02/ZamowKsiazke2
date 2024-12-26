@@ -1,0 +1,73 @@
+@model ZamowKsiazke.ViewModel.UserActivityReportViewModel
+
+<div class="container mt-4">
+    <h2>Raport aktywności użytkowników</h2>
+    <p class="text-muted">Wygenerowano: @Model.ReportGeneratedAt.ToLocalTime()</p>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Statystyki ogólne</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Całkowita liczba aktywności:</strong> @Model.TotalActivities</p>
+                    <p><strong>Liczba unikalnych użytkowników:</strong> @Model.UniqueUsers</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Rodzaj aktywności</h4>
+                </div>
+                <div class="card-body">
+                    @foreach (var stat in Model.ActivityTypeStats)
+                    {
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>@stat.Key:</span>
+                            <span class="badge bg-primary">@stat.Value</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4>Ostatnia Aktywność</h4>
+            <div class="btn-group">
+                <a href="RecentActivities" class="btn btn-outline-primary">
+                    <i class="fas fa-list"></i> Pokaż więcej
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Użytkownik</th>
+                            <th>Typ</th>
+                            <th>Opis</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var activity in Model.RecentActivities)
+                        {
+                            <tr>
+                                <td>@(activity.User?.UserName ?? activity.UserId)</td>
+                                <td>@activity.ActivityType</td>
+                                <td>@activity.Description</td>
+                                <td>@activity.Timestamp.ToLocalTime().ToString("g")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

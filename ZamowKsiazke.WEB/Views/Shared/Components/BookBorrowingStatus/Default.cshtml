@@ -1,0 +1,70 @@
+@model ZamowKsiazke.ViewComponents.BookBorrowingStatusViewModel
+
+<div class="book-borrowing-status">
+    @if (!Model.IsAvailableForBorrowing)
+    {
+        <div class="alert alert-warning">
+            <p>Ta książka nie jest dostępna do wypożyczenia.</p>
+        </div>
+    }
+    else if (Model.CurrentBorrowingId.HasValue)
+    {
+        <div class="alert alert-info">
+            <p>Aktualnie wypożyczasz tę książkę.</p>
+            <form asp-controller="BookBorrowing" asp-action="ReturnBook" method="post" style="display: inline;">
+                <input type="hidden" name="borrowingId" value="@Model.CurrentBorrowingId" />
+                <input type="hidden" name="bookId" value="@Model.BookId" />
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-rotate-left"></i>&nbsp;Zwróć książkę
+                </button>
+            </form>
+        </div>
+    }
+    else if (Model.IsAvailable)
+    {
+        <div class="alert alert-success">
+            <p>Ta książka jest dostępna do wypożyczenia.</p>
+            <div class="borrowing-details mb-3">
+                <p><strong>Cena wypożyczenia:</strong> @Model.BorrowingPrice zł</p>
+                <p><strong>Maksymalny okres wypożyczenia:</strong> @Model.MaxBorrowingDays dni</p>
+            </div>
+            <form asp-controller="BookBorrowing" asp-action="BorrowBook" method="post">
+                <input type="hidden" name="bookId" value="@Model.BookId" />
+                
+                <div class="form-group mb-3">
+                    <label for="borrowingDays">Okres wypożyczenia (dni):</label>
+                    <input type="number" class="form-control" id="borrowingDays" name="borrowingDays" 
+                           min="1" max="@Model.MaxBorrowingDays" required />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Preferowany sposób kontaktu:</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="contactPreference" 
+                               id="emailContact" value="Email" checked>
+                        <label class="form-check-label" for="emailContact">
+                            Email
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="contactPreference" 
+                               id="phoneContact" value="Phone">
+                        <label class="form-check-label" for="phoneContact">
+                            Telefon
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    <i class="fa-solid fa-book"></i>&nbsp;Wypożycz książkę
+                </button>
+            </form>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            <p>Ta książka jest aktualnie wypożyczona.</p>
+        </div>
+    }
+</div>

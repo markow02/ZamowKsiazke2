@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35514.174
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZamowKsiazke.TESTS", "ZamowKsiazke.TESTS\ZamowKsiazke.TESTS.csproj", "{DCD26425-0351-4B63-9232-E76B3E6401F3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{64FDB2A9-286D-433B-B427-A2AAFB531AAD} = {64FDB2A9-286D-433B-B427-A2AAFB531AAD}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZamowKsiazke.WEB", "ZamowKsiazke.WEB\ZamowKsiazke.WEB.csproj", "{64FDB2A9-286D-433B-B427-A2AAFB531AAD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DCD26425-0351-4B63-9232-E76B3E6401F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCD26425-0351-4B63-9232-E76B3E6401F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCD26425-0351-4B63-9232-E76B3E6401F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCD26425-0351-4B63-9232-E76B3E6401F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64FDB2A9-286D-433B-B427-A2AAFB531AAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64FDB2A9-286D-433B-B427-A2AAFB531AAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64FDB2A9-286D-433B-B427-A2AAFB531AAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64FDB2A9-286D-433B-B427-A2AAFB531AAD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

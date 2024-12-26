@@ -1,0 +1,96 @@
+@model IEnumerable<ZamowKsiazke.Models.BookBorrowing>
+
+@{
+    ViewData["Title"] = "Zarządzanie wypożyczeniami";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Użytkownik</th>
+                    <th>Książka</th>
+                    <th>Data zamówienia</th>
+                    <th>Okres wypożyczenia</th>
+                    <th>Cena</th>
+                    <th>Status</th>
+                    <th>Kontakt</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var borrowing in Model)
+                {
+                    <tr>
+                        <td>@borrowing.User?.Email</td>
+                        <td>@borrowing.Book?.Title</td>
+                        <td>@borrowing.BorrowDate.ToLocalTime().ToString("g")</td>
+                        <td>@borrowing.BorrowingDays dni</td>
+                        <td>@borrowing.BorrowingPrice zł</td>
+                        <td>
+                            @switch (borrowing.Status)
+                            {
+                                case "Pending":
+                                    <span class="badge bg-warning">Oczekuje</span>
+                                    break;
+                                case "Approved":
+                                    <span class="badge bg-success">Zatwierdzone</span>
+                                    break;
+                                case "Rejected":
+                                    <span class="badge bg-danger">Odrzucone</span>
+                                    break;
+                                case "Completed":
+                                    <span class="badge bg-info">Zakończone</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-secondary">@borrowing.Status</span>
+                                    break;
+                            }
+                        </td>
+                        <td>@borrowing.ContactPreference</td>
+                        <td>
+                            @if (borrowing.Status == "Pending")
+                            {
+                                <form asp-action="UpdateBorrowingStatus" method="post" style="display: inline;">
+                                    <input type="hidden" name="borrowingId" value="@borrowing.Id" />
+                                    <input type="hidden" name="status" value="Approved" />
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="fa-solid fa-check"></i> Zatwierdź
+                                    </button>
+                                </form>
+                                <form asp-action="UpdateBorrowingStatus" method="post" style="display: inline;">
+                                    <input type="hidden" name="borrowingId" value="@borrowing.Id" />
+                                    <input type="hidden" name="status" value="Rejected" />
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fa-solid fa-xmark"></i> Odrzuć
+                                    </button>
+                                </form>
+                            }
+                            <a asp-controller="Books" asp-action="Details" asp-route-id="@borrowing.BookId" 
+                               class="btn btn-info btn-sm">
+                                <i class="fa-solid fa-book"></i> Zobacz książkę
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

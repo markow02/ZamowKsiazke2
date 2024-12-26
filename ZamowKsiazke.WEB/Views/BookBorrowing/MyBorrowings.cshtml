@@ -1,0 +1,158 @@
+@model ZamowKsiazke.ViewModel.MyBooksViewModel
+
+@{
+    ViewData["Title"] = "Moje książki";
+}
+
+<div class="container mt-4">
+    <h2>@ViewData["Title"]</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="mb-0">Wypożyczone książki</h3>
+        </div>
+        <div class="card-body">
+            @if (!Model.BorrowedBooks.Any())
+            {
+                <p>Nie masz jeszcze żadnych wypożyczeń.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Tytuł książki</th>
+                                <th>Autor</th>
+                                <th>Data wypożyczenia</th>
+                                <th>Okres wypożyczenia</th>
+                                <th>Cena</th>
+                                <th>Status</th>
+                                <th>Kontakt</th>
+                                <th>Data zwrotu</th>
+                                <th>Akcje</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var borrowing in Model.BorrowedBooks)
+                            {
+                                <tr>
+                                    <td>@borrowing.Book?.Title</td>
+                                    <td>@borrowing.Book?.Author</td>
+                                    <td>@borrowing.BorrowDate.ToLocalTime().ToString("g")</td>
+                                    <td>@borrowing.BorrowingDays dni</td>
+                                    <td>@borrowing.BorrowingPrice zł</td>
+                                    <td>
+                                        @switch (borrowing.Status)
+                                        {
+                                            case "Pending":
+                                                <span class="badge bg-warning">Oczekuje na zatwierdzenie</span>
+                                                break;
+                                            case "Approved":
+                                                <span class="badge bg-success">Zatwierdzone</span>
+                                                break;
+                                            case "Rejected":
+                                                <span class="badge bg-danger">Odrzucone</span>
+                                                break;
+                                            case "Completed":
+                                                <span class="badge bg-info">Zakończone</span>
+                                                break;
+                                            default:
+                                                <span class="badge bg-secondary">@borrowing.Status</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>@borrowing.ContactPreference</td>
+                                    <td>@(borrowing.ReturnDate?.ToLocalTime().ToString("g") ?? "-")</td>
+                                    <td>
+                                        @if (!borrowing.IsReturned && borrowing.Status == "Approved")
+                                        {
+                                            <form asp-action="ReturnBook" method="post" style="display: inline;">
+                                                <input type="hidden" name="borrowingId" value="@borrowing.Id" />
+                                                <input type="hidden" name="bookId" value="@borrowing.BookId" />
+                                                <button type="submit" class="btn btn-primary btn-sm">
+                                                    <i class="fa-solid fa-rotate-left"></i> Zwróć książkę
+                                                </button>
+                                            </form>
+                                        }
+                                        <a asp-controller="Store" asp-action="Details" asp-route-id="@borrowing.BookId" 
+                                           class="btn btn-info btn-sm">
+                                            <i class="fa-solid fa-book"></i> Zobacz książkę
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="mb-0">Zakupione książki</h3>
+        </div>
+        <div class="card-body">
+            @if (!Model.PurchasedBooks.Any())
+            {
+                <p>Nie masz jeszcze żadnych zakupionych książek.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Numer zamówienia</th>
+                                <th>Data zakupu</th>
+                                <th>Książki</th>
+                                <th>Wartość</th>
+                                <th>Akcje</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model.PurchasedBooks)
+                            {
+                                <tr>
+                                    <td>@order.Id</td>
+                                    <td>@order.OrderDate.ToLocalTime().ToString("g")</td>
+                                    <td>
+                                        @foreach (var item in order.OrderItems)
+                                        {
+                                            <div>@item.Book.Title (@item.Quantity szt.)</div>
+                                        }
+                                    </td>
+                                    <td>@order.OrderTotal zł</td>
+                                    <td>
+                                        @foreach (var item in order.OrderItems)
+                                        {
+                                            <a asp-controller="Store" asp-action="Details" asp-route-id="@item.BookId" 
+                                               class="btn btn-info btn-sm mb-1">
+                                                <i class="fa-solid fa-book"></i> Zobacz książkę
+                                            </a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

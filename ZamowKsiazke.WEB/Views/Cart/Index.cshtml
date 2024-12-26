@@ -1,0 +1,109 @@
+﻿@model ZamowKsiazke.Models.Cart
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Koszyk</h1>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    @if (Model.CartItems?.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover text-center">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Obraz</th>
+                        <th>Tytuł</th>
+                        <th>Cena</th>
+                        <th>Ilość</th>
+                        <th>Usuń</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.CartItems)
+                    {
+                        var bookTotal = (item.Book?.Price ?? 0) * item.Quantity;
+                        <tr>
+                            <td class="align-middle">
+                                <a class="a-cleanup" asp-controller="Store" asp-action="Details" asp-route-id="@item.Book?.Id">
+                                    <img src="@item.Book?.ImageUrl" class="img-thumbnail" style="height: 6em" alt="@(item.Book?.Title ?? "Książka")" />
+                                </a>
+                            </td>
+                            <td class="align-middle">
+                                <a class="a-cleanup text-decoration-none" asp-controller="Store" asp-action="Details" asp-route-id="@item.Book?.Id">
+                                    @(item.Book?.Title ?? "Nieznana książka")
+                                </a>
+                            </td>
+                            <td class="align-middle">
+                                @bookTotal.ToString("c")
+                            </td>
+                            <td class="align-middle">
+                                <a asp-controller="Cart" asp-action="ReduceQuantity" asp-route-id="@item.Book?.Id" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fa-solid fa-minus"></i>
+                                </a>
+                                <span class="badge bg-primary text-white">@item.Quantity</span>
+                                <a asp-controller="Cart" asp-action="IncreaseQuantity" asp-route-id="@item.Book?.Id" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fa-solid fa-plus"></i>
+                                </a>
+                            </td>
+                            <td class="align-middle">
+                                <a asp-controller="Cart" asp-action="RemoveFromCart" asp-route-id="@item.Book?.Id" class="btn btn-sm btn-danger">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end">
+                            <strong>Suma:</strong>
+                        </td>
+                        <td class="align-middle">
+                            <strong>@Model.GetCartTotal().ToString("c")</strong>
+                        </td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between mt-3">
+            <a asp-controller="Cart" asp-action="ClearCart" class="btn btn-primary">
+                <i class="fa-solid fa-trash-can"></i> Wyczyść koszyk
+            </a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a asp-controller="Order" asp-action="Checkout" class="btn btn-success">
+                    <i class="fa-solid fa-shopping-cart"></i> Kup
+                </a>
+            }
+            else
+            {
+                <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-success">
+                    <i class="fa-solid fa-sign-in"></i> Zaloguj się, aby kupić
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center">
+            <h3>Twój koszyk jest pusty</h3>
+            <a asp-controller="Store" asp-action="Index" class="btn btn-primary mt-3">
+                <i class="fa-solid fa-shopping-basket"></i> Przejdź do sklepu
+            </a>
+        </div>
+    }
+</div>

@@ -1,0 +1,75 @@
+﻿@model IEnumerable<ZamowKsiazke.Models.Book>
+
+@{
+    ViewData["Title"] = "Indeks";
+
+    string HasImage(ZamowKsiazke.Models.Book book)
+    {
+        if (!string.IsNullOrEmpty(book.ImageUrl))
+        {
+            return "fa-solid fa-check text-success";
+        }
+        else
+        {
+            return "fa-solid fa-x text-danger";
+        }
+    }
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">Indeks</h2>
+                    <a asp-action="Create" class="btn btn-light"><i class="fa-solid fa-book"></i> Dodaj książkę</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover text-center">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Tytuł</th>
+                                    <th>Autor</th>
+                                    <th>Język</th>
+                                    <th>ISBN</th>
+                                    <th>Data publikacji</th>
+                                    <th>Cena</th>
+                                    <th>Ilość</th>
+                                    <th>Ma obraz</th>
+                                    <th>Akcje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td class="align-middle">@item.Title</td>
+                                        <td class="align-middle">@item.Author</td>
+                                        <td class="align-middle">@item.Language</td>
+                                        <td class="align-middle">@item.ISBN</td>
+                                        <td class="align-middle">@item.DatePublished.ToShortDateString()</td>
+                                        <td class="align-middle">@item.Price zł</td>
+                                        <td class="align-middle">@item.StockQuantity</td>
+                                        <td class="align-middle"><i class="@HasImage(item)"></i></td>
+                                        <td class="align-middle">
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm" title="Edytuj">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </a>
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-success btn-sm" title="Szczegóły">
+                                                <i class="fa-solid fa-circle-info"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm" title="Usuń">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,77 @@
+﻿@model ZamowKsiazke.Models.Book
+
+@{
+    ViewData["Title"] = "Szczegóły";
+}
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Szczegóły</h1>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title">@Model.Title</h4>
+                    <hr />
+                    <dl class="row">
+                        <dt class="col-sm-3">Autor</dt>
+                        <dd class="col-sm-9">@Model.Author</dd>
+                        <dt class="col-sm-3">Język</dt>
+                        <dd class="col-sm-9">@Model.Language</dd>
+                        <dt class="col-sm-3">ISBN</dt>
+                        <dd class="col-sm-9">@Model.ISBN</dd>
+                        <dt class="col-sm-3">Data publikacji</dt>
+                        <dd class="col-sm-9">@Model.DatePublished.ToShortDateString()</dd>
+                        <dt class="col-sm-3">Cena</dt>
+                        <dd class="col-sm-9">@Model.Price zł</dd>
+                        <dt class="col-sm-3">Opis</dt>
+                        <dd class="col-sm-9">@Model.Description</dd>
+                        @if (Model.IsAvailableForBorrowing)
+                        {
+                            <dt class="col-sm-3">Wypożyczenie</dt>
+                            <dd class="col-sm-9">
+                                <span class="badge bg-success">Dostępna do wypożyczenia</span>
+                                <br />
+                                <small class="text-muted">
+                                    Cena wypożyczenia: @(Model.BorrowingPrice ?? 0) zł
+                                    <br />
+                                    Maksymalny okres: @(Model.MaxBorrowingDays ?? 0) dni
+                                </small>
+                            </dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+
+            @if (Model.IsAvailableForBorrowing)
+            {
+                <div class="card shadow-sm mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Status wypożyczenia</h5>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            @await Component.InvokeAsync("BookBorrowingStatus", new { bookId = Model.Id })
+                        }
+                        else
+                        {
+                            <p>Zaloguj się, aby wypożyczyć książkę.</p>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="mt-4 text-center">
+                <a asp-action="Index" class="btn btn-warning"><i class="fa-solid fa-backward-step"></i>&nbsp;Powrót</a>
+                <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@Model.Id" class="btn btn-primary ms-3">
+                    <i class="fa-solid fa-cart-plus"></i>&nbsp;Dodaj do koszyka
+                </a>
+            </div>
+        </div>
+        <div class="col-md-4 text-center">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" class="img-fluid img-thumbnail" style="max-height: 600px; width: auto;" alt="@Model.Title" />
+            }
+        </div>
+    </div>
+</div>

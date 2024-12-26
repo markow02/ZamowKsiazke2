@@ -1,0 +1,80 @@
+﻿@model ZamowKsiazke.Models.Book
+
+@{
+    ViewData["Title"] = "Usuń";
+}
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Usuń</h1>
+
+    <h3 class="text-center">Czy na pewno chcesz to usunąć?</h3>
+    <div class="card shadow-sm mt-4">
+        <div class="card-body">
+            <h4>@Model.Title</h4>
+            <hr />
+            <div class="row">
+                <div class="col-md-8">
+                    <dl class="row">
+                        <dt class="col-sm-3">Opis</dt>
+                        <dd class="col-sm-9">@Model.Description</dd>
+                        
+                        <dt class="col-sm-3">Język</dt>
+                        <dd class="col-sm-9">@Model.Language</dd>
+                        
+                        <dt class="col-sm-3">ISBN</dt>
+                        <dd class="col-sm-9">@Model.ISBN</dd>
+                        
+                        <dt class="col-sm-3">Data publikacji</dt>
+                        <dd class="col-sm-9">@Model.DatePublished.ToShortDateString()</dd>
+                        
+                        <dt class="col-sm-3">Cena</dt>
+                        <dd class="col-sm-9">@Model.Price zł</dd>
+                        
+                        <dt class="col-sm-3">Autor</dt>
+                        <dd class="col-sm-9">@Model.Author</dd>
+                        
+                        <dt class="col-sm-3">Ilość na stanie</dt>
+                        <dd class="col-sm-9">@Model.StockQuantity</dd>
+
+                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                        {
+                            <dt class="col-sm-3">URL obrazu</dt>
+                            <dd class="col-sm-9">@Model.ImageUrl</dd>
+                        }
+
+                        @if (Model.IsAvailableForBorrowing)
+                        {
+                            <dt class="col-sm-3">Wypożyczenie</dt>
+                            <dd class="col-sm-9">
+                                <span class="badge bg-success">Dostępna do wypożyczenia</span>
+                                <br />
+                                <small class="text-muted">
+                                    Cena wypożyczenia: @(Model.BorrowingPrice ?? 0) zł
+                                    <br />
+                                    Maksymalny okres: @(Model.MaxBorrowingDays ?? 0) dni
+                                </small>
+                            </dd>
+                        }
+                    </dl>
+                </div>
+                <div class="col-md-4 text-center">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" class="img-fluid img-thumbnail" style="max-height: 400px;" alt="@Model.Title" />
+                    }
+                </div>
+            </div>
+            <form asp-action="Delete" class="mt-4">
+                <input type="hidden" asp-for="Id" />
+                <div class="text-center">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Czy na pewno chcesz usunąć tę książkę?')">
+                        <i class="fa-solid fa-trash-can"></i> Usuń
+                    </button>
+                    <a asp-action="Index" class="btn btn-warning">
+                        <i class="fa-solid fa-backward-step"></i> Powrót
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

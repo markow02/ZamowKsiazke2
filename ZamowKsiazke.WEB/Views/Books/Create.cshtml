@@ -1,0 +1,134 @@
+@model ZamowKsiazke.Models.Book
+
+@{
+    ViewData["Title"] = "Dodaj";
+}
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Dodaj książkę</h1>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label">Tytuł</label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Opis</label>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Language" class="form-label">Język</label>
+                                    <input asp-for="Language" class="form-control" />
+                                    <span asp-validation-for="Language" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="ISBN" class="form-label">ISBN</label>
+                                    <input asp-for="ISBN" class="form-control" />
+                                    <span asp-validation-for="ISBN" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="DatePublished" class="form-label">Data publikacji</label>
+                                    <input asp-for="DatePublished" class="form-control" type="date" />
+                                    <span asp-validation-for="DatePublished" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Price" class="form-label">Cena (zł)</label>
+                                    <input asp-for="Price" class="form-control" type="number" />
+                                    <span asp-validation-for="Price" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Author" class="form-label">Autor</label>
+                            <input asp-for="Author" class="form-control" />
+                            <span asp-validation-for="Author" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ImageUrl" class="form-label">URL obrazu</label>
+                            <input asp-for="ImageUrl" class="form-control" />
+                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="StockQuantity" class="form-label">Ilość na stanie</label>
+                            <input asp-for="StockQuantity" class="form-control" type="number" />
+                            <span asp-validation-for="StockQuantity" class="text-danger"></span>
+                        </div>
+
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <div class="form-check">
+                                    <input asp-for="IsAvailableForBorrowing" class="form-check-input" type="checkbox" />
+                                    <label asp-for="IsAvailableForBorrowing" class="form-check-label">Dostępna do wypożyczenia</label>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="MaxBorrowingDays" class="form-label">Maksymalny okres wypożyczenia (dni)</label>
+                                            <input asp-for="MaxBorrowingDays" class="form-control" type="number" />
+                                            <span asp-validation-for="MaxBorrowingDays" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="BorrowingPrice" class="form-label">Cena wypożyczenia (zł)</label>
+                                            <input asp-for="BorrowingPrice" class="form-control" type="number" />
+                                            <span asp-validation-for="BorrowingPrice" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        @if (!string.IsNullOrEmpty(Model?.ImageUrl))
+                        {
+                            <div class="text-center mb-3">
+                                <img src="@Model.ImageUrl" class="img-fluid img-thumbnail" style="max-height: 400px;" alt="@Model.Title" />
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a asp-action="Index" class="btn btn-warning">
+                        <i class="fa-solid fa-backward-step"></i> Powrót
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-plus"></i> Dodaj
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

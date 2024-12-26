@@ -1,0 +1,65 @@
+﻿@model ZamowKsiazke.Models.Order
+@inject ZamowKsiazke.Models.Cart Cart
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Potwierdź swój zakup</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <p>Po złożeniu zamówienia będziesz mieć 48 godzin na dokonanie płatności w sklepie.</p>
+                    </div>
+
+                    @if (!ViewContext.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                        </div>
+                    }
+
+                    <div class="table-responsive mb-4">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Książka</th>
+                                    <th>Ilość</th>
+                                    <th class="text-end">Cena</th>
+                                    <th class="text-end">Suma</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Cart.GetAllCartItems())
+                                {
+                                    <tr>
+                                        <td>@(item.Book?.Title ?? "Nieznana książka")</td>
+                                        <td>@item.Quantity</td>
+                                        <td class="text-end">@(item.Book?.Price ?? 0) zł</td>
+                                        <td class="text-end">@((item.Book?.Price ?? 0) * item.Quantity) zł</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Suma całkowita:</strong></td>
+                                    <td class="text-end"><strong>@Cart.GetCartTotal() zł</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <form asp-action="Checkout" method="post" class="form-horizontal" role="form">
+                        <div class="form-group row">
+                            <div class="col-md-12 text-center">
+                                <a asp-controller="Cart" asp-action="Index" class="btn btn-secondary btn-lg me-2">Wróć do koszyka</a>
+                                <button type="submit" class="btn btn-primary btn-lg">Zamawiam i płacę</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

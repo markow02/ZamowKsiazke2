@@ -1,0 +1,113 @@
+@model IEnumerable<ZamowKsiazke.Models.Order>
+
+@{
+    ViewData["Title"] = "Moje Zamówienia";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Numer zamówienia</th>
+                <th>Data zamówienia</th>
+                <th>Termin płatności</th>
+                <th>Status</th>
+                <th>Suma</th>
+                <th>Szczegóły</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model)
+            {
+                <tr>
+                    <td>#@order.Id</td>
+                    <td>@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>
+                        @order.PaymentDeadline.ToString("dd/MM/yyyy HH:mm")
+                        @if (!order.IsPaid && DateTime.UtcNow > order.PaymentDeadline)
+                        {
+                            <span class="text-danger">(Przekroczono termin)</span>
+                        }
+                    </td>
+                    <td>
+                        @if (order.IsPaid)
+                        {
+                            <div>
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i>
+                                    @order.OrderStatus
+                                </span>
+                                <div class="mt-2">
+                                    <small class="text-success">
+                                        Zamówienie zostało opłacone
+                                    </small>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-clock me-1"></i>
+                                    @order.OrderStatus
+                                </span>
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        Prosimy o dokonanie płatności w sklepie w ciągu 48 godzin od złożenia zamówienia.
+                                    </small>
+                                </div>
+                                @if (DateTime.UtcNow > order.PaymentDeadline)
+                                {
+                                    <div class="mt-1">
+                                        <small class="text-danger">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            Przekroczono termin płatności
+                                        </small>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </td>
+                    <td>@order.OrderTotal zł</td>
+                    <td>
+                        <button class="btn btn-link" type="button" 
+                                data-bs-toggle="collapse" 
+                                data-bs-target="#orderDetails_@order.Id" 
+                                aria-expanded="false">
+                            Pokaż szczegóły
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="6">
+                        <div class="collapse" id="orderDetails_@order.Id">
+                            <div class="card card-body">
+                                <h6>Zamówione książki:</h6>
+                                <ul class="list-unstyled">
+                                    @foreach (var item in order.OrderItems)
+                                    {
+                                        <li class="mb-2">
+                                            <strong>@item.Book?.Title</strong><br />
+                                            Ilość: @item.Quantity szt.<br />
+                                            Cena: @item.Price zł<br />
+                                            Suma: @(item.Quantity * item.Price) zł
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        Nie masz jeszcze żadnych zamówień.
+    </div>
+}

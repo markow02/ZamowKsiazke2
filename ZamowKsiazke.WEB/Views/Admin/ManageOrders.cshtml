@@ -1,0 +1,103 @@
+@model IEnumerable<ZamowKsiazke.ViewModel.OrderManagementViewModel>
+
+@{
+    ViewData["Title"] = "Zarządzanie zamówieniami";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Użytkownik</th>
+                <th>Data Zamówienia</th>
+                <th>Termin Płatności</th>
+                <th>Status</th>
+                <th>Suma</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model)
+            {
+                <tr>
+                    <td>@order.OrderId</td>
+                    <td>@order.UserName</td>
+                    <td>@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>
+                        @order.PaymentDeadline.ToString("dd/MM/yyyy HH:mm")
+                        @if (!order.IsPaid && DateTime.UtcNow > order.PaymentDeadline)
+                        {
+                            <span class="text-danger">(Przekroczono termin)</span>
+                        }
+                    </td>
+                    <td>
+                        @if (order.IsPaid)
+                        {
+                            <span class="badge bg-success">@order.OrderStatus</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">@order.OrderStatus</span>
+                        }
+                    </td>
+                    <td>@order.OrderTotal zł</td>
+                    <td>
+                        @if (!order.IsPaid)
+                        {
+                            <form asp-controller="Admin" asp-action="UpdatePaymentStatus" method="post">
+                                <input type="hidden" name="orderId" value="@order.OrderId" />
+                                <input type="hidden" name="isPaid" value="true" />
+                                <button type="submit" 
+                                    class="btn btn-success"
+                                    onclick="return confirm('Czy na pewno chcesz potwierdzić płatność za to zamówienie?')">
+                                    <i class="fas fa-check-circle me-1"></i>
+                                    Opłacono
+                                </button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="7">
+                        <div class="collapse" id="orderDetails_@order.OrderId">
+                            <div class="card card-body">
+                                <h6>Szczegóły zamówienia:</h6>
+                                <ul>
+                                    @foreach (var item in order.OrderItems)
+                                    {
+                                        <li>@item.Book?.Title - @item.Quantity szt. x @item.Price zł = @(item.Quantity * item.Price) zł</li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                        <button class="btn btn-link btn-sm" type="button" 
+                                data-bs-toggle="collapse" 
+                                data-bs-target="#orderDetails_@order.OrderId" 
+                                aria-expanded="false">
+                            Pokaż/Ukryj szczegóły
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

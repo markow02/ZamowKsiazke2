@@ -1,0 +1,60 @@
+@model IEnumerable<ZamowKsiazke.ViewModel.BookBorrowingReportViewModel>
+
+@{
+    ViewData["Title"] = "Popular Books Report";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <form method="get" class="form-inline">
+            <div class="form-group mx-2">
+                <label for="startDate" class="mr-2">Start Date:</label>
+                <input type="date" id="startDate" name="startDate" class="form-control" 
+                       value="@Context.Request.Query["startDate"]" />
+            </div>
+            <div class="form-group mx-2">
+                <label for="endDate" class="mr-2">End Date:</label>
+                <input type="date" id="endDate" name="endDate" class="form-control" 
+                       value="@Context.Request.Query["endDate"]" />
+            </div>
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        @if (!Model.Any())
+        {
+            <p>No borrowing data available for the selected period.</p>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Book Title</th>
+                        <th>Author</th>
+                        <th>Times Borrowed</th>
+                        <th>Currently Borrowed</th>
+                        <th>Current Borrower</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var book in Model)
+                    {
+                        <tr>
+                            <td>@book.BookTitle</td>
+                            <td>@book.Author</td>
+                            <td>@book.BorrowCount</td>
+                            <td>@(book.IsCurrentlyBorrowed ? "Yes" : "No")</td>
+                            <td>@(book.CurrentBorrowerName ?? "-")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
