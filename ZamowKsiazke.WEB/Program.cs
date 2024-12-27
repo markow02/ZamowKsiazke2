@@ -2,112 +2,136 @@ using ZamowKsiazke.Models;
 using Microsoft.EntityFrameworkCore;
 using ZamowKsiazke.Data;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Http;
 using ZamowKsiazke.Services;
 using ZamowKsiazke.Services.Interfaces;
+using NLog;
+using NLog.Web;
+using ZamowKsiazke.WEB.Middleware;
 
-var builder = WebApplication.CreateBuilder(args);
+var logger = LogManager.Setup().LoadConfigurationFromFile("NLog.config").GetCurrentClassLogger();
+logger.Debug("Initializing main application");
 
-// Configure services
-builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
-
-// Register the DbContext with the dependency injection container
-builder.Services.AddDbContext<ZamowKsiazkeContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ZamowKsiazkeContext")));
-
-
-builder.Services.AddDefaultIdentity<DefaultUser>()
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<ZamowKsiazkeContext>();
-
-
-//builder.Services.AddTransient<IEmailSender, EmailSender>();
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-builder.Services.AddScoped<Cart>(sp => Cart.GetCart(sp));
-builder.Services.AddScoped<IOrderService, OrderService>(); // Register IOrderService
-builder.Services.AddScoped<IUserActivityService, UserActivityService>(); // Register IUserActivityService
-builder.Services.AddScoped<IBookBorrowingService, BookBorrowingService>(); // Register IBookBorrowingService
-
-builder.Services.AddDistributedMemoryCache();
-
-builder.Services.AddSession(options =>
+try
 {
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-    //options.IdleTimeout = TimeSpan.FromSeconds(10);
-});
+    var builder = WebApplication.CreateBuilder(args);
 
-var app = builder.Build();
+    // Configure services
+    builder.Services.AddControllersWithViews();
+    builder.Services.AddRazorPages();
 
-// Seedowanie danych
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var userManager = services.GetRequiredService<UserManager<DefaultUser>>();
-    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    // Register the DbContext with the dependency injection container
+    builder.Services.AddDbContext<ZamowKsiazkeContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("ZamowKsiazkeContext")));
 
-    try
+    builder.Services.AddDefaultIdentity<DefaultUser>()
+        .AddRoles<IdentityRole>()
+        .AddEntityFrameworkStores<ZamowKsiazkeContext>();
+
+    builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+    builder.Services.AddScoped<Cart>(sp => Cart.GetCart(sp));
+    builder.Services.AddScoped<IOrderService, OrderService>();
+    builder.Services.AddScoped<IUserActivityService, UserActivityService>();
+    builder.Services.AddScoped<IBookBorrowingService, BookBorrowingService>();
+
+    builder.Services.AddDistributedMemoryCache();
+
+    builder.Services.AddSession(options =>
     {
-        // Seed default data
-        SeedData.Initialize(services);
+        options.Cookie.HttpOnly = true;
+        options.Cookie.IsEssential = true;
+    });
 
-        // Create Admin Role if it doesn't exist
-        if (!await roleManager.RoleExistsAsync("Admin"))
+    builder.Logging.ClearProviders();
+    builder.Host.UseNLog();
+
+    var app = builder.Build();
+
+    // Middleware configuration
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseExceptionHandler("/Error");
+        app.UseHsts();
+    }
+    else
+    {
+        app.UseDeveloperExceptionPage();
+    }
+
+    app.UseHttpsRedirection();
+    app.UseStaticFiles();
+
+    app.UseRouting();
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.UseSession();
+
+    app.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Store}/{action=Index}/{id?}");
+    app.MapRazorPages();
+
+    app.UseMiddleware<ErrorHandlingMiddleware>();
+
+    // Seed database
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        var userManager = services.GetRequiredService<UserManager<DefaultUser>>();
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+        try
         {
-            await roleManager.CreateAsync(new IdentityRole("Admin"));
-        }
+            // Seed default data
+            SeedData.Initialize(services);
 
-        // Create Admin User if it doesn't exist
-        var adminEmail = "admin@example.com";
-        var adminUser = await userManager.FindByEmailAsync(adminEmail);
-
-        if (adminUser == null)
-        {
-            var admin = new DefaultUser
+            // Create Admin Role if it doesn't exist
+            if (!await roleManager.RoleExistsAsync("Admin"))
             {
-                UserName = adminEmail,
-                Email = adminEmail,
-                FirstName = "Admin",
-                LastName = "User",
-                Address = "Admin Address",
-                City = "Admin City",
-                ZipCode = "00-000"
-            };
+                await roleManager.CreateAsync(new IdentityRole("Admin"));
+            }
 
-            var result = await userManager.CreateAsync(admin, "Admin123!");
+            // Create Admin User if it doesn't exist
+            var adminEmail = "admin@example.com";
+            var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
-            if (result.Succeeded)
+            if (adminUser == null)
             {
-                await userManager.AddToRoleAsync(admin, "Admin");
+                var admin = new DefaultUser
+                {
+                    UserName = adminEmail,
+                    Email = adminEmail,
+                    FirstName = "Admin",
+                    LastName = "User",
+                    Address = "Admin Address",
+                    City = "Admin City",
+                    ZipCode = "00-000"
+                };
+
+                var result = await userManager.CreateAsync(admin, "Admin123!");
+
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(admin, "Admin");
+                }
             }
         }
+        catch (Exception ex)
+        {
+            var scopedLogger = services.GetRequiredService<ILogger<Program>>();
+            scopedLogger.LogError(ex, "An error occurred while seeding the database.");
+        }
     }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding the database.");
-    }
-}
 
-if (!app.Environment.IsDevelopment())
+    app.Run();
+}
+catch (Exception ex)
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+    logger.Error(ex, "Stopped program because of an exception");
+    throw;
 }
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
-app.UseSession();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Store}/{action=Index}/{id?}");
-app.MapRazorPages();
-
-app.Run();
+finally
+{
+    LogManager.Shutdown();
+}

@@ -5,6 +5,7 @@ using ZamowKsiazke.Data;
 using ZamowKsiazke.Models;
 using Moq;
 using System.Linq.Expressions;
+using MockQueryable.Moq;
 
 namespace ZamowKsiazke.Tests
 {
@@ -123,11 +124,14 @@ namespace ZamowKsiazke.Tests
             var mockSet = new Mock<DbSet<Book>>();
             var mockContext = new Mock<ZamowKsiazkeContext>(new DbContextOptions<ZamowKsiazkeContext>());
 
-            // Set up the mock context to return the mocked DbSet
-            mockContext.Setup(m => m.Book).Returns(mockSet.Object);
-
-            // Simulate exception when querying the DbSet
+            // Przygotowanie fałszywego IQueryable z wyjątkiem
+            var queryable = new List<Book>().AsQueryable();
             mockSet.As<IQueryable<Book>>().Setup(m => m.Provider).Throws(new Exception("Database error"));
+            mockSet.As<IQueryable<Book>>().Setup(m => m.Expression).Returns(queryable.Expression);
+            mockSet.As<IQueryable<Book>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
+            mockSet.As<IQueryable<Book>>().Setup(m => m.GetEnumerator()).Returns(queryable.GetEnumerator());
+
+            mockContext.Setup(m => m.Book).Returns(mockSet.Object);
 
             var controller = new StoreController(mockContext.Object);
 
@@ -138,6 +142,8 @@ namespace ZamowKsiazke.Tests
             var viewResult = Assert.IsType<ViewResult>(result);
             Assert.Equal("Error", viewResult.ViewName);
         }
+
+
 
     }
 }

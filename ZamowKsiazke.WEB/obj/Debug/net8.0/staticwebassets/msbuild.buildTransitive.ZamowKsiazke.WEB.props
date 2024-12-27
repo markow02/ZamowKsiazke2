@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\ZamowKsiazke.WEB.props" />
-</Project>

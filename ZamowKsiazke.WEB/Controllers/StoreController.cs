@@ -25,15 +25,22 @@ namespace ZamowKsiazke.Controllers
                 return NotFound();
             }
 
-            var book = await _context.Book
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (book == null)
+            try
             {
-                return NotFound();
-            }
+                var book = await _context.Book.FirstOrDefaultAsync(m => m.Id == id);
+                if (book == null)
+                {
+                    return NotFound();
+                }
 
-            return View(book);
+                return View(book);
+            }
+            catch (Exception)
+            {
+                return View("Error");
+            }
         }
+
 
     }
 }

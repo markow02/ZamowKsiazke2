@@ -7,9 +7,9 @@ using ZamowKsiazke.Services.Interfaces;
 using ZamowKsiazke.ViewModel;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MockQueryable.Moq;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using MockQueryable;
+using Microsoft.AspNetCore.Http;
 
 namespace ZamowKsiazke.Tests
 {
@@ -130,12 +130,16 @@ namespace ZamowKsiazke.Tests
         {
             // Arrange
             var orderId = 1;
-            var order = new Order { Id = orderId, UserId = "user1", IsPaid = false };
+            var initialOrder = new Order { Id = orderId, UserId = "user1", IsPaid = false, OrderTotal = 100 };
+            var updatedOrder = new Order { Id = orderId, UserId = "user1", IsPaid = true, OrderTotal = 100 };
 
-            _mockOrderService.Setup(service => service.GetOrderWithItemsAsync(orderId))
-                .ReturnsAsync(order);
+            _mockOrderService.SetupSequence(service => service.GetOrderWithItemsAsync(orderId))
+                .ReturnsAsync(initialOrder)
+                .ReturnsAsync(updatedOrder);
+
             _mockOrderService.Setup(service => service.UpdatePaymentStatusAsync(orderId, true))
                 .Returns(Task.CompletedTask);
+
             _mockUserActivityService.Setup(service => service.LogActivityAsync(
                 It.IsAny<string>(),
                 It.IsAny<string>(),
@@ -143,8 +147,10 @@ namespace ZamowKsiazke.Tests
                 It.IsAny<string>()
             )).Returns(Task.CompletedTask);
 
-            var tempDataMock = new Mock<ITempDataDictionary>();
-            _controller.TempData = tempDataMock.Object;
+            // Use actual TempDataDictionary instead of a mock
+            var httpContext = new DefaultHttpContext();
+            var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());
+            _controller.TempData = tempData;
 
             // Act
             var result = await _controller.UpdatePaymentStatus(orderId, true);
@@ -153,13 +159,22 @@ namespace ZamowKsiazke.Tests
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("ManageOrders", redirectResult.ActionName);
 
+            // Verify services were called
             _mockOrderService.Verify(service => service.UpdatePaymentStatusAsync(orderId, true), Times.Once);
             _mockUserActivityService.Verify(service => service.LogActivityAsync(
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<string>()), Times.Once);
+
+            // Verify TempData message
+            var successMessage = _controller.TempData["Success"] as string;
+            Assert.NotNull(successMessage);
+            Assert.Contains($"Potwierdzono płatność za zamówienie #{orderId}", successMessage);
         }
+
+
+
 
         [Fact]
         public async Task UpdatePaymentStatus_InvalidOrderId_ReturnsError()
