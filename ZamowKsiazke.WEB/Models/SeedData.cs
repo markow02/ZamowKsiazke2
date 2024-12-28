@@ -9,9 +9,9 @@ namespace ZamowKsiazke.Models
         {
             using (var context = new ZamowKsiazkeContext(serviceProvider.GetRequiredService<DbContextOptions<ZamowKsiazkeContext>>()))
             {
-                if (context.Book.Any())    // Check if database contains any books
+                if (context.Book.Any())
                 {
-                    return;     // Database contains books already
+                    return;    
                 }
 
                 context.Book.AddRange(

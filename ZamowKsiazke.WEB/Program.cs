@@ -15,11 +15,9 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    // Configure services
     builder.Services.AddControllersWithViews();
     builder.Services.AddRazorPages();
 
-    // Register the DbContext with the dependency injection container
     builder.Services.AddDbContext<ZamowKsiazkeContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("ZamowKsiazkeContext")));
 
@@ -46,7 +44,6 @@ try
 
     var app = builder.Build();
 
-    // Middleware configuration
     if (!app.Environment.IsDevelopment())
     {
         app.UseExceptionHandler("/Error");
@@ -74,7 +71,6 @@ try
 
     app.UseMiddleware<ErrorHandlingMiddleware>();
 
-    // Seed database
     using (var scope = app.Services.CreateScope())
     {
         var services = scope.ServiceProvider;
@@ -83,16 +79,13 @@ try
 
         try
         {
-            // Seed default data
             SeedData.Initialize(services);
 
-            // Create Admin Role if it doesn't exist
             if (!await roleManager.RoleExistsAsync("Admin"))
             {
                 await roleManager.CreateAsync(new IdentityRole("Admin"));
             }
 
-            // Create Admin User if it doesn't exist
             var adminEmail = "admin@example.com";
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
 

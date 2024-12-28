@@ -4,8 +4,6 @@ using ZamowKsiazke.Controllers;
 using ZamowKsiazke.Data;
 using ZamowKsiazke.Models;
 using Moq;
-using System.Linq.Expressions;
-using MockQueryable.Moq;
 
 namespace ZamowKsiazke.Tests
 {
@@ -124,7 +122,6 @@ namespace ZamowKsiazke.Tests
             var mockSet = new Mock<DbSet<Book>>();
             var mockContext = new Mock<ZamowKsiazkeContext>(new DbContextOptions<ZamowKsiazkeContext>());
 
-            // Przygotowanie fałszywego IQueryable z wyjątkiem
             var queryable = new List<Book>().AsQueryable();
             mockSet.As<IQueryable<Book>>().Setup(m => m.Provider).Throws(new Exception("Database error"));
             mockSet.As<IQueryable<Book>>().Setup(m => m.Expression).Returns(queryable.Expression);

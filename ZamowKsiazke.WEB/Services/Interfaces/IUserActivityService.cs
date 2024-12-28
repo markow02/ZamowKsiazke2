@@ -1,6 +1,4 @@
 using ZamowKsiazke.Models;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace ZamowKsiazke.Services.Interfaces
 {

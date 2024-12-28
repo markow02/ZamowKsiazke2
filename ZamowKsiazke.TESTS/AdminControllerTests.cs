@@ -147,7 +147,6 @@ namespace ZamowKsiazke.Tests
                 It.IsAny<string>()
             )).Returns(Task.CompletedTask);
 
-            // Use actual TempDataDictionary instead of a mock
             var httpContext = new DefaultHttpContext();
             var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());
             _controller.TempData = tempData;
@@ -159,7 +158,6 @@ namespace ZamowKsiazke.Tests
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("ManageOrders", redirectResult.ActionName);
 
-            // Verify services were called
             _mockOrderService.Verify(service => service.UpdatePaymentStatusAsync(orderId, true), Times.Once);
             _mockUserActivityService.Verify(service => service.LogActivityAsync(
                 It.IsAny<string>(),
@@ -167,7 +165,6 @@ namespace ZamowKsiazke.Tests
                 It.IsAny<string>(),
                 It.IsAny<string>()), Times.Once);
 
-            // Verify TempData message
             var successMessage = _controller.TempData["Success"] as string;
             Assert.NotNull(successMessage);
             Assert.Contains($"Potwierdzono płatność za zamówienie #{orderId}", successMessage);

@@ -31,221 +31,6 @@ namespace ZamowKsiazke.Controllers
         _bookBorrowingService = bookBorrowingService;
     }
 
-        //[HttpGet]
-        //public IActionResult ListAllRoles()
-        //{
-        //    var roles = _roleManager.Roles;
-        //    return View(roles);
-        //}
-
-        //[HttpGet]
-        //public IActionResult CreateRole()
-        //{
-        //    return View();
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> CreateRole(CreateRoleViewModel model)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        IdentityRole identityRole = new IdentityRole
-        //        {
-        //            Name = model.RoleName
-        //        };
-
-        //        var result = await _roleManager.CreateAsync(identityRole);
-
-        //        if (result.Succeeded)
-        //        {
-        //            return RedirectToAction("ListAllRoles");
-        //        }
-
-        //        foreach (var error in result.Errors)
-        //        {
-        //            ModelState.AddModelError("", error.Description);
-        //        }
-        //    }
-        //    return View(model);
-        //}
-
-        //[HttpGet]
-        //public async Task<IActionResult> EditRole(string id)
-        //{
-        //    var role = await _roleManager.FindByIdAsync(id);
-        //    if (role == null)
-        //    {
-        //        ViewBag.ErrorMessage = $"Role with Id = {id} cannot be found";
-        //        return View("Error");
-        //    }
-
-        //    if (role.Name == null)
-        //    {
-        //        ViewBag.ErrorMessage = $"Role name is null for Id = {id}";
-        //        return View("Error");
-        //    }
-
-        //    EditRoleViewModel model = new EditRoleViewModel
-        //    {
-        //        Id = role.Id,
-        //        RoleName = role.Name
-        //    };
-
-        //    foreach (var user in _userManager.Users)
-        //    {
-        //        if (user.UserName != null && await _userManager.IsInRoleAsync(user, role.Name))
-        //        {
-        //            model.Users.Add(user.UserName);
-        //        }
-        //    }
-
-        //    return View(model);
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> EditRole(EditRoleViewModel model)
-        //{
-        //    var role = await _roleManager.FindByIdAsync(model.Id);
-        //    if (role == null)
-        //    {
-        //        ViewBag.ErrorMessage = $"Role with Id = {model.Id} cannot be found";
-        //        return View("Error");
-        //    }
-        //    else
-        //    {
-        //        if (model.RoleName == null)
-        //        {
-        //            ModelState.AddModelError("", "Role name cannot be null");
-        //            return View(model);
-        //        }
-
-        //        role.Name = model.RoleName;
-        //        var result = await _roleManager.UpdateAsync(role);
-        //        if (result.Succeeded)
-        //        {
-        //            return RedirectToAction("ListAllRoles");
-        //        }
-
-        //        foreach (var error in result.Errors)
-        //        {
-        //            ModelState.AddModelError(string.Empty, error.Description);
-        //        }
-        //    }
-        //    return View(model);
-        //}
-
-        //[HttpGet]
-        //public async Task<IActionResult> EditUsersInRole(string id)
-        //{
-        //    var role = await _roleManager.FindByIdAsync(id);
-
-        //    if (role == null)
-        //    {
-        //        ViewData["ErrorMessage"] = $"No role with Id '{id}' was found";
-        //        return View("Error");
-        //    }
-
-        //    ViewData["roleId"] = id;
-        //    ViewData["roleName"] = role.Name;
-
-        //    var model = new List<UserRoleViewModel>();
-
-        //    if (role.Name == null)
-        //    {
-        //        ViewData["ErrorMessage"] = $"Role name is null for Id '{id}'";
-        //        return View("Error");
-        //    }
-
-        //    foreach (var user in _userManager.Users)
-        //    {
-        //        if (user.UserName != null)
-        //        {
-        //            UserRoleViewModel userRoleVM = new()
-        //            {
-        //                Id = user.Id,
-        //                Name = user.UserName
-        //            };
-
-        //            if (await _userManager.IsInRoleAsync(user, role.Name))
-        //            {
-        //                userRoleVM.IsSelected = true;
-        //            }
-        //            else
-        //            {
-        //                userRoleVM.IsSelected = false;
-        //            }
-
-        //            model.Add(userRoleVM);
-        //        }
-        //    }
-
-        //    return View(model);
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> EditUsersInRole(string id, List<UserRoleViewModel> model)
-        //{
-        //    var role = await _roleManager.FindByIdAsync(id);
-
-        //    if (role == null)
-        //    {
-        //        ViewData["ErrorMessage"] = $"No role with Id '{id}' was found";
-        //        return View("Error");
-        //    }
-
-        //    for (int i = 0; i < model.Count; i++)
-        //    {
-        //        var user = await _userManager.FindByIdAsync(model[i].Id);
-        //        if (user != null && role.Name != null)
-        //        {
-        //            IdentityResult? result = null;
-
-        //            if (model[i].IsSelected && !(await _userManager.IsInRoleAsync(user, role.Name)))
-        //            {
-        //                result = await _userManager.AddToRoleAsync(user, role.Name);
-        //            }
-        //            else if (!model[i].IsSelected && await _userManager.IsInRoleAsync(user, role.Name))
-        //            {
-        //                result = await _userManager.RemoveFromRoleAsync(user, role.Name);
-        //            }
-
-        //            if (result != null && !result.Succeeded)
-        //            {
-        //                ModelState.AddModelError("", "Cannot update user roles");
-        //                return View(model);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            ModelState.AddModelError("", "Cannot update user roles");
-        //            return View(model);
-        //        }
-        //    }
-
-        //    return RedirectToAction("EditRole", new { Id = id });
-        //}
-        //[HttpPost]
-        //public async Task<IActionResult> DeleteRole(string id)
-        //{
-        //    var role = await _roleManager.FindByIdAsync(id);
-        //    if (role == null)
-        //    {
-        //        ViewBag.ErrorMessage = $"Rola z Id = {id} nie została znaleziona";
-        //        return View("Error");
-        //    }
-            
-        //    var result = await _roleManager.DeleteAsync(role);
-        //    if (result.Succeeded)
-        //    {
-        //        return RedirectToAction("ListAllRoles");
-        //    }
-
-        //    foreach (var error in result.Errors)
-        //    {
-        //        ModelState.AddModelError("", error.Description);
-        //    }
-        //    return View("ListAllRoles", _roleManager.Roles);
-        //}
 
         [HttpGet]
         public async Task<IActionResult> ActivityReport()
@@ -374,7 +159,6 @@ namespace ZamowKsiazke.Controllers
         {
             var viewModel = new BookActivityReportViewModel();
 
-            // Get all orders with items and user information
             var orders = await _orderService.GetAllOrdersAsync();
             foreach (var order in orders)
             {
@@ -395,7 +179,6 @@ namespace ZamowKsiazke.Controllers
                 }
             }
 
-            // Get all borrowings with book and user information
             var borrowings = await _bookBorrowingService.GetAllBorrowingsAsync();
             foreach (var borrowing in borrowings)
             {
@@ -416,7 +199,6 @@ namespace ZamowKsiazke.Controllers
                 });
             }
 
-            // Calculate totals
             viewModel.TotalPurchases = viewModel.PurchaseActivities.Sum(p => p.Quantity);
             viewModel.TotalBorrowings = viewModel.BorrowingActivities.Count;
             viewModel.TotalRevenue = viewModel.PurchaseActivities.Sum(p => p.Price * p.Quantity);

@@ -1,8 +1,6 @@
 ﻿﻿﻿﻿﻿﻿using Microsoft.AspNetCore.Mvc;
-using ZamowKsiazke.Data;
 using ZamowKsiazke.Models;
 using ZamowKsiazke.Services.Interfaces;
-
 using Microsoft.AspNetCore.Authorization;
 
 namespace ZamowKsiazke.Controllers

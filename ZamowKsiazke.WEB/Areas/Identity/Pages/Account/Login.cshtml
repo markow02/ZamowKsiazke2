@@ -33,53 +33,15 @@
                             <button id="login-submit" type="submit" class="btn btn-primary btn-lg">Zaloguj się</button>
                         </div>
                          <div class="mt-3">
-@*                             <p>
-                                <a id="forgot-password" asp-page="./ForgotPassword">Zapomniałeś hasła?</a>
-                            </p> *@
                             <p>
                                 <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Zarejestruj się jako nowy użytkownik</a>
                             </p>
-@*                             <p>
-                                <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Wyślij ponownie potwierdzenie email</a>
-                            </p> *@
                         </div> 
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    @* <div class="row justify-content-center mt-4">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-secondary text-white">
-                    <h3 class="mb-0">Użyj innej usługi do logowania</h3>
-                </div>
-                <div class="card-body">
-                    @if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                    {
-                        <div>
-                            <p>
-                                Brak skonfigurowanych zewnętrznych usług uwierzytelniania. Zobacz ten <a href="https://go.microsoft.com/fwlink/?LinkID=532715">artykuł
-                                o konfigurowaniu tej aplikacji ASP.NET do obsługi logowania za pomocą zewnętrznych usług</a>.
-                            </p>
-                        </div>
-                    }
-                    else
-                    {
-                        <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                            <div class="d-grid gap-2">
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-outline-primary btn-lg" name="provider" value="@provider.Name" title="Zaloguj się za pomocą konta @provider.DisplayName">@provider.DisplayName</button>
-                                }
-                            </div>
-                        </form>
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-</div> *@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

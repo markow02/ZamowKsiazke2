@@ -3,7 +3,6 @@ using ZamowKsiazke.Data;
 using ZamowKsiazke.Models;
 using ZamowKsiazke.Services.Interfaces;
 using ZamowKsiazke.Services.Extensions;
-using System.Threading.Tasks;
 
 namespace ZamowKsiazke.Services
 {
@@ -58,7 +57,6 @@ namespace ZamowKsiazke.Services
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
-            // Log the order creation
             await _activityService.LogOrderCreatedAsync(userId, order.Id.ToString());
 
             return order;
@@ -99,18 +97,15 @@ namespace ZamowKsiazke.Services
             order.OrderStatus = isPaid ? "Opłacono" : "Oczekuje na płatność";
             order.PaymentDeadline = isPaid ? DateTime.UtcNow : DateTime.UtcNow.AddHours(48);
 
-            // Ensure changes are tracked and saved
             _context.Orders.Update(order);
             await _context.SaveChangesAsync();
 
-            // Verify the changes were saved
             await _context.Entry(order).ReloadAsync();
             if (order.IsPaid != isPaid || order.OrderStatus != (isPaid ? "Opłacono" : "Oczekuje na płatność"))
             {
                 throw new Exception("Nie udało się zaktualizować statusu zamówienia.");
             }
             
-            // Log the payment status update with more detailed information
             await _activityService.LogActivityAsync(
                 order.UserId, 
                 "OrderPaymentUpdate", 

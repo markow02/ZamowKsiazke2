@@ -41,6 +41,7 @@ namespace ZamowKsiazke.Models
         public bool IsAvailableForBorrowing { get; set; }
 
         [Display(Name = "Maksymalny okres wypożyczenia (dni)")]
+        
         public int? MaxBorrowingDays { get; set; }
 
         [Display(Name = "Cena wypożyczenia")]
